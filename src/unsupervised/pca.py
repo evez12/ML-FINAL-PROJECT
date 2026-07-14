@@ -19,6 +19,8 @@ class PCA:
         # and would otherwise crash later with a confusing LinAlgError
         if n_samples < 2:
             raise ValueError("X must contain at least 2 samples.")
+        if not np.all(np.isfinite(X)):
+            raise ValueError("X must not contain NaN or infinite values.")
         if not (1 <= self.n_components <= n_features):
             raise ValueError(f"n_components must be between 1 and {n_features}")
 
@@ -62,6 +64,8 @@ class PCA:
         if self.components_ is None:
             raise RuntimeError("call fit() before transform()")
         X = np.asarray(X, dtype=float)
+        if not np.all(np.isfinite(X)):
+            raise ValueError("X must not contain NaN or infinite values.")
         return (X - self._center) @ self.components_.T
 
     def fit_transform(self, X: np.ndarray) -> np.ndarray:

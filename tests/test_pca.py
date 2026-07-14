@@ -1,8 +1,8 @@
 # Importing library for numerical operations (arrays, math)
 import pytest
 import numpy as np
-from sklearn.decomposition import PCA as SklearnPCA
 from src.unsupervised.pca import PCA
+from sklearn.decomposition import PCA as SklearnPCA
 
 @pytest.fixture
 def three_blobs():
@@ -75,6 +75,22 @@ def test_transform_with_wrong_number_of_features_raises(three_blobs):
     pca = PCA(n_components=2).fit(three_blobs)
     with pytest.raises(ValueError):
         pca.transform(np.zeros((10, 4)))
+
+@pytest.mark.parametrize("bad_value", [np.nan, np.inf, -np.inf])
+def test_non_finite_input_raises(three_blobs, bad_value):
+    # NaN/Inf should be rejected clearly, not silently poison the eigendecomposition
+    bad = three_blobs.copy()
+    bad[0, 0] = bad_value
+    with pytest.raises(ValueError):
+        PCA(n_components=2).fit(bad)
+
+@pytest.mark.parametrize("bad_value", [np.nan, np.inf, -np.inf])
+def test_transform_non_finite_input_raises(three_blobs, bad_value):
+    pca = PCA(n_components=2).fit(three_blobs)
+    bad = three_blobs[:5].copy()
+    bad[0, 0] = bad_value
+    with pytest.raises(ValueError):
+        pca.transform(bad)
 
 @pytest.mark.parametrize("n_components", [0, -1, 10])
 def test_invalid_n_components_raises(three_blobs, n_components):

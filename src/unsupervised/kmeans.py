@@ -23,12 +23,18 @@ class KMeans:
 
         if X.ndim != 2:
             raise ValueError("X must be a 2D array.")
+        if X.shape[1] == 0:
+            raise ValueError("X must contain at least one feature.")
         if not np.all(np.isfinite(X)):
             raise ValueError("X must not contain NaN or infinite values.")
         if self.n_clusters <= 0:
             raise ValueError("n_clusters must be greater than 0.")
         if self.n_clusters > X.shape[0]:
             raise ValueError("n_clusters cannot exceed the number of samples.")
+        if self.max_iter <= 0:
+            raise ValueError("max_iter must be greater than 0.")
+        if self.tol < 0:
+            raise ValueError("tol must not be negative.")
 
         n_samples, n_features = X.shape
         rng = np.random.default_rng(self.random_state)
@@ -76,6 +82,12 @@ class KMeans:
         if self.centroids_ is None:
             raise RuntimeError("call fit() before predict()")
         X = np.asarray(X, dtype=float)
+        if X.ndim != 2:
+            raise ValueError("X must be a 2D array.")
+        if X.shape[1] != self.centroids_.shape[1]:
+            raise ValueError("X must have the same number of features as the data used to fit().")
+        if not np.all(np.isfinite(X)):
+            raise ValueError("X must not contain NaN or infinite values.")
         distances = self._distances_to_centroids(X, self.centroids_)
         return np.argmin(distances, axis=1)
 
