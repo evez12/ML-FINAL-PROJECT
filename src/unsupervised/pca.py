@@ -18,41 +18,35 @@ class PCA:
         if not (1 <= self.n_components <= n_features):
             raise ValueError(f"n_components must be between 1 and {n_features}")
 
-        # center the data on zero (subtract the mean of each feature)
-        # PCA only cares about how points spread out relative to each other,
-        # not where they sit on the axes
+        # Center the data on zero (subtract the mean of each feature)
+        # PCA only cares about how points spread out relative to each other, not where they sit on the axes
         self._center = X.mean(axis=0)
         centered = X - self._center
 
-        # covariance matrix: tells us how much each pair of features
-        # varies together (big value = they move together, ~0 = unrelated)
+        # Covariance matrix: tells us how much each pair of features
+        # Varies together (big value = they move together, ~0 = unrelated)
         cov_matrix = np.cov(centered, rowvar=False)
 
-        # eigenvectors of the covariance matrix = the directions of most
-        # spread in the data. eigenvalues = how much spread (variance)
-        # is along each direction. cov matrix is symmetric, so we use
-        # eigh instead of eig -> more stable and always gives real numbers
+        # Eigenvectors of the covariance matrix = the directions of most spread in the data. 
+        # Eigenvalues = how much spread (variance) is along each direction. 
+        # Cov matrix is symmetric, so we use eigh instead of eig -> more stable and always gives real numbers
         eigvals, eigvecs = np.linalg.eigh(cov_matrix)
 
-        # eigh sorts smallest -> largest, but we want the directions with
-        # the MOST variance first, so flip the order
+        # Eigh sorts smallest -> largest, but we want the directions with the MOST variance first, so flip the order
         order = np.argsort(eigvals)[::-1]
         eigvals = eigvals[order]
         eigvecs = eigvecs[:, order]
 
-        # keep only the top n_components directions
+        # Keep only the top n_components directions
         self.components_ = eigvecs[:, :self.n_components].T
         self.explained_variance_ = eigvals[:self.n_components]
 
-        # what fraction of the total variance in the data do these
-        # components capture (used for the scree plot later)
+        # What fraction of the total variance in the data do these components capture 
         self.explained_variance_ratio_ = self.explained_variance_ / eigvals.sum()
 
         return self
 
     def transform(self, X: np.ndarray) -> np.ndarray:
-        # project the data onto the components we kept -> fewer columns,
-        # same number of rows
         if self.components_ is None:
             raise RuntimeError("call fit() before transform()")
         X = np.asarray(X, dtype=float)

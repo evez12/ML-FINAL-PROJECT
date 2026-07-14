@@ -1,0 +1,57 @@
+warning: in the working copy of 'src/unsupervised/pca.py', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/src/unsupervised/pca.py b/src/unsupervised/pca.py[m
+[1mindex 5e9bd98..fa80185 100644[m
+[1m--- a/src/unsupervised/pca.py[m
+[1m+++ b/src/unsupervised/pca.py[m
+[36m@@ -18,41 +18,35 @@[m [mclass PCA:[m
+         if not (1 <= self.n_components <= n_features):[m
+             raise ValueError(f"n_components must be between 1 and {n_features}")[m
+ [m
+[31m-        # center the data on zero (subtract the mean of each feature)[m
+[31m-        # PCA only cares about how points spread out relative to each other,[m
+[31m-        # not where they sit on the axes[m
+[32m+[m[32m        # Center the data on zero (subtract the mean of each feature)[m
+[32m+[m[32m        # PCA only cares about how points spread out relative to each other, not where they sit on the axes[m
+         self._center = X.mean(axis=0)[m
+         centered = X - self._center[m
+ [m
+[31m-        # covariance matrix: tells us how much each pair of features[m
+[31m-        # varies together (big value = they move together, ~0 = unrelated)[m
+[32m+[m[32m        # Covariance matrix: tells us how much each pair of features[m
+[32m+[m[32m        # Varies together (big value = they move together, ~0 = unrelated)[m
+         cov_matrix = np.cov(centered, rowvar=False)[m
+ [m
+[31m-        # eigenvectors of the covariance matrix = the directions of most[m
+[31m-        # spread in the data. eigenvalues = how much spread (variance)[m
+[31m-        # is along each direction. cov matrix is symmetric, so we use[m
+[31m-        # eigh instead of eig -> more stable and always gives real numbers[m
+[32m+[m[32m        # Eigenvectors of the covariance matrix = the directions of most spread in the data.[m[41m [m
+[32m+[m[32m        # Eigenvalues = how much spread (variance) is along each direction.[m[41m [m
+[32m+[m[32m        # Cov matrix is symmetric, so we use eigh instead of eig -> more stable and always gives real numbers[m
+         eigvals, eigvecs = np.linalg.eigh(cov_matrix)[m
+ [m
+[31m-        # eigh sorts smallest -> largest, but we want the directions with[m
+[31m-        # the MOST variance first, so flip the order[m
+[32m+[m[32m        # Eigh sorts smallest -> largest, but we want the directions with the MOST variance first, so flip the order[m
+         order = np.argsort(eigvals)[::-1][m
+         eigvals = eigvals[order][m
+         eigvecs = eigvecs[:, order][m
+ [m
+[31m-        # keep only the top n_components directions[m
+[32m+[m[32m        # Keep only the top n_components directions[m
+         self.components_ = eigvecs[:, :self.n_components].T[m
+         self.explained_variance_ = eigvals[:self.n_components][m
+ [m
+[31m-        # what fraction of the total variance in the data do these[m
+[31m-        # components capture (used for the scree plot later)[m
+[32m+[m[32m        # What fraction of the total variance in the data do these components capture[m[41m [m
+         self.explained_variance_ratio_ = self.explained_variance_ / eigvals.sum()[m
+ [m
+         return self[m
+ [m
+     def transform(self, X: np.ndarray) -> np.ndarray:[m
+[31m-        # project the data onto the components we kept -> fewer columns,[m
+[31m-        # same number of rows[m
+         if self.components_ is None:[m
+             raise RuntimeError("call fit() before transform()")[m
+         X = np.asarray(X, dtype=float)[m
