@@ -15,6 +15,10 @@ class PCA:
     def fit(self, X: np.ndarray) -> "PCA":
         X = np.asarray(X, dtype=float)
         n_samples, n_features = X.shape
+        # need at least 2 samples -- variance is undefined for 0 or 1 sample,
+        # and would otherwise crash later with a confusing LinAlgError
+        if n_samples < 2:
+            raise ValueError("X must contain at least 2 samples.")
         if not (1 <= self.n_components <= n_features):
             raise ValueError(f"n_components must be between 1 and {n_features}")
 
@@ -25,7 +29,9 @@ class PCA:
 
         # Covariance matrix: tells us how much each pair of features
         # Varies together (big value = they move together, ~0 = unrelated)
-        cov_matrix = np.cov(centered, rowvar=False)
+        # np.atleast_2d guards against the single-feature case, where
+        # np.cov collapses to a 0-d scalar instead of a (1, 1) matrix
+        cov_matrix = np.atleast_2d(np.cov(centered, rowvar=False))
 
         # Eigenvectors of the covariance matrix = the directions of most spread in the data. 
         # Eigenvalues = how much spread (variance) is along each direction. 
@@ -41,8 +47,14 @@ class PCA:
         self.components_ = eigvecs[:, :self.n_components].T
         self.explained_variance_ = eigvals[:self.n_components]
 
-        # What fraction of the total variance in the data do these components capture 
-        self.explained_variance_ratio_ = self.explained_variance_ / eigvals.sum()
+        # What fraction of the total variance in the data do these components capture
+        # if every point is identical, total variance is 0 -> avoid a 0/0 NaN and
+        # report 0% explained variance instead
+        total_variance = eigvals.sum()
+        if total_variance > 0:
+            self.explained_variance_ratio_ = self.explained_variance_ / total_variance
+        else:
+            self.explained_variance_ratio_ = np.zeros_like(self.explained_variance_)
 
         return self
 
