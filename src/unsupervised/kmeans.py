@@ -17,6 +17,8 @@ class KMeans:
         self.n_iter_: Optional[int] = None
 
     def fit(self, X: np.ndarray) -> "KMeans":
+        """Fit K-Means to X using Lloyd's algorithm.
+        """
         X = np.asarray(X, dtype=float)
 
         if X.ndim != 2:
