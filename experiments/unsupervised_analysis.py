@@ -1,6 +1,6 @@
 # Importing library for numerical operations (arrays, math)
-import numpy as np
 import sys
+import numpy as np
 from pathlib import Path
 from collections.abc import Iterable
 
