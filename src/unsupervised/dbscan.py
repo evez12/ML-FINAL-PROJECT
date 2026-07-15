@@ -25,13 +25,13 @@ class DBSCAN:
             raise ValueError("X must contain at least one feature.")
         if not np.all(np.isfinite(X)):
             raise ValueError("X must not contain NaN or infinite values.")
-        if not isinstance(self.eps, (int, float, np.integer, np.floating)):
+        if isinstance(self.eps, bool) or not isinstance(self.eps, (int, float, np.integer, np.floating)):
             raise TypeError("eps must be a number.")
         if not np.isfinite(self.eps):
             raise ValueError("eps must be finite.")
         if self.eps <= 0:
             raise ValueError("eps must be greater than 0.")
-        if not isinstance(self.min_samples, (int, np.integer)):
+        if isinstance(self.min_samples, bool) or not isinstance(self.min_samples, (int, np.integer)):
             raise TypeError("min_samples must be an integer.")
         if self.min_samples <= 0:
             raise ValueError("min_samples must be greater than 0.")
