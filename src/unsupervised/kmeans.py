@@ -1,10 +1,8 @@
-# Importing library for numerical operations 
 import numpy as np
 from typing import Optional
 
 class KMeans:
-    """K-Means clustering using Lloyd's algorithm.
-    """
+    """K-Means clustering using Lloyd's algorithm."""
 
     def __init__(self, n_clusters: int, max_iter: int = 300, tol: float = 1e-4, random_state: Optional[int] = None) -> None:
         self.n_clusters = n_clusters
@@ -17,8 +15,7 @@ class KMeans:
         self.n_iter_: Optional[int] = None
 
     def fit(self, X: np.ndarray) -> "KMeans":
-        """Fit K-Means to X using Lloyd's algorithm.
-        """
+        """Fit K-Means to X using Lloyd's algorithm."""
         X = np.asarray(X, dtype=float)
 
         if X.ndim != 2:
@@ -39,33 +36,26 @@ class KMeans:
         n_samples, n_features = X.shape
         rng = np.random.default_rng(self.random_state)
 
-        # pick k random points from the data as the starting centroids
         start_idx = rng.choice(n_samples, size=self.n_clusters, replace=False)
         centroids = X[start_idx].copy()
 
         for iteration in range(self.max_iter):
-            # step 1: assign every point to its nearest centroid
             distances = self._distances_to_centroids(X, centroids)
             labels = np.argmin(distances, axis=1)
 
-            # step 2: move each centroid to the mean of the points assigned to it
             new_centroids = np.empty_like(centroids)
             for k in range(self.n_clusters):
                 points_in_cluster = X[labels == k]
                 if len(points_in_cluster) == 0:
-                    # empty cluster (no points landed on it) -> re-seed with a random point
                     new_centroids[k] = X[rng.integers(n_samples)]
                 else:
                     new_centroids[k] = points_in_cluster.mean(axis=0)
 
-            # step 3: if centroids barely moved since last round, we've converged
-            # (Frobenius norm of the shift, same definition sklearn's KMeans uses)
             shift = np.linalg.norm(new_centroids - centroids)
             centroids = new_centroids
             if shift < self.tol:
                 break
 
-        # final assignment using the settled centroids
         distances = self._distances_to_centroids(X, centroids)
         labels = np.argmin(distances, axis=1)
         inertia = np.sum(np.min(distances, axis=1))
@@ -78,7 +68,6 @@ class KMeans:
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        # assign new points to the nearest already-learned centroid
         if self.centroids_ is None:
             raise RuntimeError("call fit() before predict()")
         X = np.asarray(X, dtype=float)
@@ -92,12 +81,10 @@ class KMeans:
         return np.argmin(distances, axis=1)
 
     def _distances_to_centroids(self, X: np.ndarray, centroids: np.ndarray) -> np.ndarray:
-        # squared distance from every point to every centroid, shape (n_samples, n_clusters)
         diff = X[:, np.newaxis, :] - centroids[np.newaxis, :, :]
         return np.sum(diff ** 2, axis=2)
 
 if __name__ == "__main__":
-    # quick manual test with fake data, just to see it groups points sensibly
     rng = np.random.default_rng(42)
     a = rng.normal([0, 0], 0.5, size=(50, 2))
     b = rng.normal([5, 5], 0.5, size=(50, 2))

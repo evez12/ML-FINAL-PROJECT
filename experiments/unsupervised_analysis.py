@@ -1,4 +1,3 @@
-# Importing libraries
 import sys
 import numpy as np
 from pathlib import Path
@@ -10,10 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.unsupervised.kmeans import KMeans
 
 def _save_and_show(save_path: Optional[str]) -> None:
-    """Save the current figure to disk (if a path was given), show it, then
-    close it. Closing matters here since the pipeline creates ~18 figures in
-    one run -- without closing, matplotlib keeps every one in memory.
-    """
+    """Save, show, and close the current figure."""
     import matplotlib.pyplot as plt
     if save_path is not None:
         plt.savefig(save_path, dpi=150, bbox_inches="tight")
@@ -22,20 +18,7 @@ def _save_and_show(save_path: Optional[str]) -> None:
 
 def plot_scree(explained_variance_ratio: np.ndarray, save_path: Optional[str] = None,
                 n_components_selected: Optional[int] = None) -> None:
-    """Plot cumulative explained variance vs number of components kept (scree plot).
-
-    Helps decide how many principal components to keep -- look for where the
-    curve crosses a target like 90%, or where it starts to flatten out.
-
-    If n_components_selected is given, a vertical line marks that count on the
-    plot with the exact variance it captures (e.g. "7 PCs retained (90.4%
-    variance)") -- makes the report figure self-explanatory without needing
-    the console output alongside it.
-
-    If save_path is given, the figure is also saved to disk (e.g. into
-    figures/unsupervised/) so it can be reused in the report without rerunning
-    the pipeline.
-    """
+    """Scree plot of cumulative explained variance."""
     import matplotlib.pyplot as plt
     cumulative_variance = np.cumsum(explained_variance_ratio)
     n_components = range(1, len(cumulative_variance) + 1)
@@ -48,9 +31,6 @@ def plot_scree(explained_variance_ratio: np.ndarray, save_path: Optional[str] = 
     plt.xlabel("Number of components")
     plt.ylabel("Cumulative explained variance")
     plt.title("Scree Plot")
-    # forcing every tick label works fine for small feature counts, but with
-    # 50+ components (e.g. Covertype) the labels overlap into unreadable mush --
-    # thin them out to every 5th tick once there are more than 20 components
     if len(n_components) > 20:
         plt.xticks(range(5, len(n_components) + 1, 5))
     else:
@@ -59,24 +39,11 @@ def plot_scree(explained_variance_ratio: np.ndarray, save_path: Optional[str] = 
     _save_and_show(save_path)
 
 def plot_pca_scatter(X_2d: np.ndarray, labels: np.ndarray, title: str, save_path: Optional[str] = None) -> None:
-    """Scatter plot of 2D-PCA-projected data, colored by the given labels.
-
-    Works for true class labels, K-Means cluster labels, or DBSCAN cluster
-    labels -- pass in whichever one you want to visualize. DBSCAN's noise
-    points (label -1) are drawn separately in gray, since they aren't part
-    of any real cluster.
-
-    If save_path is given, the figure is also saved to disk (e.g. into
-    figures/unsupervised/) so it can be reused in the report without rerunning
-    the pipeline.
-    """
+    """2D PCA scatter plot colored by labels."""
     import matplotlib.pyplot as plt
     noise_mask = labels == -1
     unique_labels = np.unique(labels[~noise_mask])
 
-    # letting matplotlib normalize a small number of classes across the full
-    # Greens colormap washes the lowest class out to near-white -- pick evenly
-    # spaced, clearly visible shades instead, keeping the green theme
     shades = plt.cm.Greens(np.linspace(0.4, 1.0, len(unique_labels)))
     color_lookup = {label: shades[i] for i, label in enumerate(unique_labels)}
     point_colors = np.array([color_lookup[label] for label in labels[~noise_mask]])
@@ -93,7 +60,7 @@ def plot_pca_scatter(X_2d: np.ndarray, labels: np.ndarray, title: str, save_path
     _save_and_show(save_path)
 
 def elbow_method(X: np.ndarray, k_values: Iterable[int], n_init: int = 10, random_state: int = 42) -> tuple[list[int], list[float]]:
-    """Return the best K-Means inertia (lowest of n_init restarts) for each k."""
+    """Best K-Means inertia per k, over n_init restarts."""
     X = np.asarray(X, dtype=float)
     k_values = list(k_values)
 
@@ -121,8 +88,6 @@ def elbow_method(X: np.ndarray, k_values: Iterable[int], n_init: int = 10, rando
     inertias: list[float] = []
 
     for k in k_values:
-        # try several random starting points and keep the best (lowest inertia) run,
-        # since a single run can land in a bad local minimum
         run_inertias: list[float] = []
         for init_idx in range(n_init):
             seed = random_state + init_idx
@@ -135,13 +100,7 @@ def elbow_method(X: np.ndarray, k_values: Iterable[int], n_init: int = 10, rando
     return k_values, inertias
 
 def plot_elbow(k_values, inertias, save_path: Optional[str] = None, k_used: Optional[int] = None):
-    """Plot inertia vs k. If k_used is given, marks it with a vertical line.
-
-    k_used is meant for the k that the final K-Means fit actually ran with --
-    labeled explicitly as "not elbow-selected" when it wasn't chosen from this
-    curve (e.g. when it's set to the known true class count instead), so the
-    plot doesn't misrepresent it as the result of elbow-based model selection.
-    """
+    """Elbow plot of inertia vs k."""
     import matplotlib.pyplot as plt
     plt.plot(k_values, inertias, marker="o", color="green")
     if k_used is not None:
@@ -155,13 +114,7 @@ def plot_elbow(k_values, inertias, save_path: Optional[str] = None, k_used: Opti
     _save_and_show(save_path)
 
 def k_distance_values(X: np.ndarray, min_samples: int) -> np.ndarray:
-    """Return sorted distances to each point's min_samples-th neighbor.
-
-    Used to pick a good eps for DBSCAN (look for the "knee" in the plot).
-    DBSCAN counts the point itself as one of the min_samples, so we use
-    index min_samples - 1 (index 0 in the sorted distances is the point
-    itself, at distance 0).
-    """
+    """Sorted distances to each point's min_samples-th neighbor."""
     X = np.asarray(X, dtype=float)
 
     if X.ndim != 2:
@@ -188,10 +141,7 @@ def k_distance_values(X: np.ndarray, min_samples: int) -> np.ndarray:
 
 def plot_k_distance(kth_distances: np.ndarray, min_samples: int, save_path: Optional[str] = None,
                      eps: Optional[float] = None):
-    """Plot sorted k-distances. If eps is given, marks the chosen eps with a
-    horizontal line at that distance -- this is a real selection (from
-    find_knee), unlike plot_elbow's k_used caveat.
-    """
+    """K-distance plot for choosing DBSCAN eps."""
     import matplotlib.pyplot as plt
     plt.plot(range(len(kth_distances)), kth_distances, color="green")
     if eps is not None:
@@ -203,13 +153,6 @@ def plot_k_distance(kth_distances: np.ndarray, min_samples: int, save_path: Opti
     _save_and_show(save_path)
 
 if __name__ == "__main__":
-    # This file is also the script run_all.py calls to produce the unsupervised
-    # section's required output. The real pipeline (loading the three real
-    # datasets, standardizing, running PCA/K-Means/DBSCAN, saving all figures)
-    # lives in run_unsupervised.py -- delegate to it here so both
-    # `python experiments/run_unsupervised.py` and `python experiments/run_all.py`
-    # produce the same real results, instead of this file only running a small
-    # synthetic-data smoke test.
     from experiments.run_unsupervised import run_pipeline
 
     results = [run_pipeline(name) for name in ["wdbc", "adult", "covtype"]]

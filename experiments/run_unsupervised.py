@@ -1,4 +1,3 @@
-# Importing libraries
 import gc
 import sys
 import numpy as np
@@ -21,23 +20,16 @@ from experiments.unsupervised_analysis import (
 )
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
-# figures/ is a required top-level folder per the project brief -- saving here
-# means plots survive for the report/slides without rerunning the pipeline
 FIGURES_DIR = Path(__file__).resolve().parent.parent / "figures" / "unsupervised"
 RANDOM_STATE = 42
-# K-Means only ever compares each point to a handful of centroids, so it stays fast
-# up to tens of thousands of rows. DBSCAN (and the k-distance helper) compare every
-# point to every OTHER point, so their memory cost grows with n_samples squared --
-# they need a much smaller cutoff, and a smaller sample size (high-feature-count
-# datasets like Covertype make the O(n^2) distance matrix even more expensive).
 KMEANS_LARGE_THRESHOLD = 50000
 KMEANS_SAMPLE_SIZE = 3000
 DBSCAN_LARGE_THRESHOLD = 5000
 DBSCAN_SAMPLE_SIZE = 2000
-MIN_SAMPLES = 5  # fixed default for DBSCAN across all three datasets, not individually tuned
+MIN_SAMPLES = 5
 
 def load_dataset(name: str) -> tuple[np.ndarray, np.ndarray]:
-    """Load a preprocessed dataset's train split as (X, y) NumPy arrays."""
+    """Load a preprocessed dataset's train split."""
     X_path = DATA_DIR / f"{name}_X_train_processed.csv"
     y_path = DATA_DIR / f"{name}_y_train_processed.csv"
 
@@ -59,31 +51,21 @@ def load_dataset(name: str) -> tuple[np.ndarray, np.ndarray]:
     return X, y
 
 def standardize(X: np.ndarray) -> np.ndarray:
-    """Scale each feature to zero mean, unit variance.
-
-    PCA and the distance-based clustering methods (K-Means, DBSCAN) are all
-    sensitive to feature scale -- without this, a feature with a much larger
-    raw range would dominate the variance/distance calculations regardless
-    of how informative it actually is.
-    """
+    """Zero mean, unit variance per feature."""
     mean = X.mean(axis=0)
     std = X.std(axis=0)
-    std[std == 0] = 1  # avoid divide-by-zero for any constant column
+    std[std == 0] = 1
     return (X - mean) / std
 
 def subsample(X: np.ndarray, y: np.ndarray, n: int, random_state: int) -> tuple[np.ndarray, np.ndarray]:
-    """Randomly subsample down to n rows (or fewer, if X is already smaller)."""
+    """Random subsample of n rows."""
     rng = np.random.default_rng(random_state)
     n = min(n, X.shape[0])
     idx = rng.choice(X.shape[0], size=n, replace=False)
     return X[idx], y[idx]
 
 def find_knee(values: np.ndarray) -> int:
-    """Find the "knee" of a sorted ascending curve: the point farthest from
-    the straight line connecting its first and last points. Used to pick a
-    starting-point eps for DBSCAN from the k-distance plot -- still worth
-    checking the plot by eye, this is just a reasonable default.
-    """
+    """Index of the knee in a sorted ascending curve."""
     values = np.asarray(values, dtype=float)
     if values.ndim != 1:
         raise ValueError("values must be a one-dimensional array.")
@@ -105,18 +87,7 @@ def find_knee(values: np.ndarray) -> int:
     return int(np.argmax(distances_from_line))
 
 def report_eps_candidates(X_dbscan: np.ndarray, kdist: np.ndarray, base_eps: float, min_samples: int) -> None:
-    """Print how a few eps values around the knee affect cluster count and noise.
-
-    Purely informational -- helps sanity-check the auto-picked knee against its
-    neighbors while looking at the k-distance plot. Deliberately does NOT use
-    ARI here: picking eps by whichever value maximizes agreement with the true
-    labels would leak label information into what's supposed to be an
-    unsupervised hyperparameter choice.
-
-    Costs 5 extra DBSCAN fits on top of the real one. Fine at the current
-    DBSCAN_SAMPLE_SIZE (2,000 points), but worth remembering if that constant
-    is ever raised -- each fit here is another O(n^2) distance computation.
-    """
+    """Print cluster count and noise fraction for eps near the knee."""
     print("eps sensitivity check (cluster count / noise fraction, no label info used):")
     for multiplier in [0.8, 0.9, 1.0, 1.1, 1.2]:
         eps = base_eps * multiplier
@@ -130,7 +101,7 @@ def report_eps_candidates(X_dbscan: np.ndarray, kdist: np.ndarray, base_eps: flo
               f"{noise_fraction:.2%} noise{marker}")
 
 def run_pipeline(name: str) -> dict:
-    """Run PCA, K-Means, and DBSCAN on one dataset and report the required metrics."""
+    """Run PCA, K-Means, DBSCAN on one dataset."""
     print(f"\n{'='*10} {name.upper()} {'='*10}")
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     X, y = load_dataset(name)
@@ -141,11 +112,6 @@ def run_pipeline(name: str) -> dict:
     if min(X.shape) < 2:
         raise ValueError("PCA scatter plot requires at least two samples and two features.")
 
-    # ---- PCA ----
-    # PCA runs on the full dataset. It still depends on both n_samples and
-    # n_features, but unlike this DBSCAN implementation it does not construct
-    # an n_samples-by-n_samples distance matrix, so it stays manageable even
-    # at 465k rows.
     max_components = min(X.shape[0], X.shape[1])
     pca_full = PCA(n_components=max_components).fit(X)
     n_components_90 = int(np.searchsorted(np.cumsum(pca_full.explained_variance_ratio_), 0.9) + 1)
@@ -155,9 +121,6 @@ def run_pipeline(name: str) -> dict:
 
     pca_2d = PCA(n_components=2).fit(X)
 
-    # scatter plots with hundreds of thousands of points are too slow to render
-    # and turn into an unreadable solid blob anyway (extreme overplotting), so
-    # large datasets get a representative sample just for this plot
     if X.shape[0] > KMEANS_LARGE_THRESHOLD:
         X_plot, y_plot = subsample(X, y, KMEANS_SAMPLE_SIZE, RANDOM_STATE)
     else:
@@ -166,21 +129,10 @@ def run_pipeline(name: str) -> dict:
     plot_pca_scatter(X_2d_plot, y_plot, f"{name}: True Class Labels",
                       save_path=FIGURES_DIR / f"{name}_true_labels.png")
 
-    # ---- K-Means ----
-    # the elbow curve just needs to be representative, not exhaustive -- it runs
-    # 10 restarts x 9 k-values = 90 full K-Means fits, so it always uses a capped
-    # sample regardless of dataset size, purely to keep it fast. Note this means
-    # the elbow reflects a representative sample, not necessarily the exact
-    # structure of the full dataset.
     X_elbow, _ = subsample(X, y, KMEANS_SAMPLE_SIZE, RANDOM_STATE)
     k_values, inertias = elbow_method(X_elbow, range(2, 11), n_init=10, random_state=RANDOM_STATE)
     plot_elbow(k_values, inertias, save_path=FIGURES_DIR / f"{name}_elbow.png", k_used=n_classes)
 
-    # the final reported K-Means fit (just one run) is cheap enough to use the
-    # full dataset up to tens of thousands of rows. k is set to the true number
-    # of classes here specifically to test whether clustering recovers them --
-    # that's label information, not something a real unsupervised pipeline would
-    # know in advance (in practice you'd pick k from the elbow curve instead).
     if X.shape[0] > KMEANS_LARGE_THRESHOLD:
         X_kmeans, y_kmeans = subsample(X, y, KMEANS_SAMPLE_SIZE, RANDOM_STATE)
         print(f"Subsampled to {X_kmeans.shape[0]} points for the final K-Means fit (dataset too large in full)")
@@ -194,12 +146,9 @@ def run_pipeline(name: str) -> dict:
     plot_pca_scatter(X_2d_kmeans, km.labels_, f"{name}: K-Means Cluster Labels",
                       save_path=FIGURES_DIR / f"{name}_kmeans_labels.png")
 
-    # free memory from the K-Means stage before DBSCAN's O(n^2) distance matrix --
-    # matters most on the largest dataset (Covertype), where every array is big
     del X_elbow, X_kmeans, X_2d_kmeans, X_plot, X_2d_plot
     gc.collect()
 
-    # ---- DBSCAN: O(n^2) memory, needs a much smaller subsample on large datasets ----
     if X.shape[0] > DBSCAN_LARGE_THRESHOLD:
         X_dbscan, y_dbscan = subsample(X, y, DBSCAN_SAMPLE_SIZE, RANDOM_STATE)
         print(f"Subsampled to {X_dbscan.shape[0]} points for DBSCAN (O(n^2) memory cost)")
@@ -207,7 +156,7 @@ def run_pipeline(name: str) -> dict:
         X_dbscan, y_dbscan = X, y
     X_2d_dbscan = pca_2d.transform(X_dbscan)
 
-    kdist = k_distance_values(X_dbscan, min_samples=MIN_SAMPLES)  # already sorted ascending
+    kdist = k_distance_values(X_dbscan, min_samples=MIN_SAMPLES)
     if len(kdist) < 2:
         raise ValueError("Not enough k-distance values to estimate DBSCAN eps.")
 
