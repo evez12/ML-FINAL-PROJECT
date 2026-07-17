@@ -1,5 +1,6 @@
 # Importing library for numerical operations (arrays, math)
 import numpy as np
+from typing import Optional
 
 class PCA:
     """PCA via eigendecomposition of the covariance matrix.
@@ -7,10 +8,10 @@ class PCA:
 
     def __init__(self, n_components: int) -> None:
         self.n_components = n_components
-        self.components_: np.ndarray = None
-        self.explained_variance_: np.ndarray = None
-        self.explained_variance_ratio_: np.ndarray = None
-        self._center: np.ndarray = None
+        self.components_: Optional[np.ndarray] = None
+        self.explained_variance_: Optional[np.ndarray] = None
+        self.explained_variance_ratio_: Optional[np.ndarray] = None
+        self._center: Optional[np.ndarray] = None
 
     def fit(self, X: np.ndarray) -> "PCA":
         X = np.asarray(X, dtype=float)

@@ -1,4 +1,4 @@
-# Importing library for numerical operations (arrays, math)
+# Importing library for numerical operations 
 import numpy as np
 from typing import Optional
 
@@ -6,7 +6,7 @@ class KMeans:
     """K-Means clustering using Lloyd's algorithm.
     """
 
-    def __init__(self, n_clusters: int, max_iter: int = 300, tol: float = 1e-4, random_state: int = None) -> None:
+    def __init__(self, n_clusters: int, max_iter: int = 300, tol: float = 1e-4, random_state: Optional[int] = None) -> None:
         self.n_clusters = n_clusters
         self.max_iter = max_iter
         self.tol = tol
