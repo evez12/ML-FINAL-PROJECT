@@ -25,7 +25,7 @@ EXPERIMENTS = [
     "head_to_head.py",
     "noise_robustness.py",
     "bias_variance.py",
-    "unsupervised_analysis.py",
+    "run_unsupervised.py",
 ]
 
 
