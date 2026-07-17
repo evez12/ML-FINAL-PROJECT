@@ -25,7 +25,7 @@ EXPERIMENTS = [
     "head_to_head.py",
     "noise_robustness.py",
     "bias_variance.py",
-    "unsupervised_analysis.py",
+    "run_unsupervised.py",
 ]
 
 def run_experiment(script_name: str) -> bool:
@@ -78,7 +78,7 @@ def main():
     print(f"Total Execution Time: {overall_elapsed / 60:.2f} minutes\n")
 
     for script, status in results.items():
-        icon = "Success" if status == "SUCCESS" else "❌"
+        icon = "SUCCESS" if status == "SUCCESS" else "FAILED"
         print(f" {icon} {script:30s} : {status}")
     print("#" * 60)
 
