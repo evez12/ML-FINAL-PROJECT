@@ -9,7 +9,6 @@ from sklearn.metrics import accuracy_score
 # Corrected imports for strict layout compliance
 from experiments.utils import get_figure_path, get_data_path
 
-
 def subsample_for_speed(X, y, max_samples=5000, random_state=42):
     """Safely downsamples massive datasets to drastically speed up scaling experiments
 
@@ -27,7 +26,6 @@ def subsample_for_speed(X, y, max_samples=5000, random_state=42):
         y_sampled = df_sampled.iloc[:, -1]
         return X_sampled, y_sampled
     return X, y
-
 
 def run_rf_vary_n_estimators_arrays(
         X_train,
@@ -104,7 +102,6 @@ def run_rf_vary_n_estimators_arrays(
     plt.close()
     return df, plot_path
 
-
 def run_rf_vary_max_depth_arrays(
         X_train,
         y_train,
@@ -171,7 +168,6 @@ def run_rf_vary_max_depth_arrays(
         plt.show()
     plt.close()
     return df, plot_path
-
 
 if __name__ == "__main__":
     # Load preprocessed datasets dynamically

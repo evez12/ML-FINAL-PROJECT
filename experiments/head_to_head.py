@@ -36,7 +36,6 @@ def _ensure_arrays(X, y) -> Tuple[np.ndarray, np.ndarray]:
     y_np = np.asarray(y).ravel()
     return X_np, y_np
 
-
 def run_head_to_head_arrays(
     X,
     y,
@@ -158,7 +157,6 @@ def run_head_to_head_arrays(
         plt.close()
 
     return df, summary, plot_paths
-
 
 if __name__ == "__main__":
     # Load same preprocessed datasets used by other experiments

@@ -95,7 +95,6 @@ def bias_variance_decomposition(model_constructor, X_train, y_train, X_test, y_t
 
     return {"bias_sq": bias_sq, "variance": variance, "brier": brier_total, "acc_mean": float(np.mean(accs))}
 
-
 def run_on_wdbc(B=100, out_dir="../report/figures", random_state=42):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -160,7 +159,6 @@ def run_on_wdbc(B=100, out_dir="../report/figures", random_state=42):
     plt.close()
 
     return df, plot_path
-
 
 if __name__ == "__main__":
     run_on_wdbc(B=100, out_dir="../report/figures", random_state=42)

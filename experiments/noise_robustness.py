@@ -10,10 +10,8 @@ from sklearn.metrics import accuracy_score
 from utils import get_figure_path
 from utils import get_data_path
 
-
 def _as_array(y):
     return np.asarray(y).ravel()
-
 
 def _flip_labels(y, eta, rng):
     """Flip fraction eta of labels in y using RNG. For multiclass, sample a different label uniformly."""
@@ -30,7 +28,6 @@ def _flip_labels(y, eta, rng):
             continue
         y[i] = rng.choice(other)
     return y
-
 
 def run_noise_robustness_arrays(
     X_train,
@@ -109,7 +106,6 @@ def run_noise_robustness_arrays(
     plt.close()
 
     return df, plot_path
-
 
 if __name__ == "__main__":
     # Load preprocessed datasets

@@ -1,4 +1,4 @@
-# Importing library for numerical operations (arrays, math)
+# Importing libraries
 import gc
 import sys
 import numpy as np

@@ -28,7 +28,6 @@ EXPERIMENTS = [
     "unsupervised_analysis.py",
 ]
 
-
 def run_experiment(script_name: str) -> bool:
     script_path = CURRENT_DIR / script_name
     if not script_path.exists():
@@ -57,7 +56,6 @@ def run_experiment(script_name: str) -> bool:
         print(f"\n[-] FAILED: {script_name} exited with code {process.returncode} after {elapsed:.2f} seconds.")
         return False
 
-
 def main():
     print(f"Initializing Master Run...")
     print(f"Project Root: {ROOT_DIR}")
@@ -80,10 +78,9 @@ def main():
     print(f"Total Execution Time: {overall_elapsed / 60:.2f} minutes\n")
 
     for script, status in results.items():
-        icon = "Sucsess" if status == "SUCCESS" else "❌"
+        icon = "Success" if status == "SUCCESS" else "❌"
         print(f" {icon} {script:30s} : {status}")
     print("#" * 60)
-
 
 if __name__ == "__main__":
     main()

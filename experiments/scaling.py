@@ -9,14 +9,12 @@ from sklearn.preprocessing import label_binarize
 from utils import get_figure_path
 from utils import get_data_path
 
-
 def _as_array(y):
     if hasattr(y, "squeeze"):
         arr = y.squeeze()
     else:
         arr = y
     return np.asarray(arr).ravel()
-
 
 def _align_proba(proba, model_classes, classes):
     n_classes = len(classes)
@@ -28,7 +26,6 @@ def _align_proba(proba, model_classes, classes):
         except Exception:
             pass
     return aligned
-
 
 def train_and_report(X_train, y_train, X_test, y_test, name: str = "dataset"):
     y_train = _as_array(y_train)
@@ -91,7 +88,6 @@ def train_and_report(X_train, y_train, X_test, y_test, name: str = "dataset"):
             print(f"  Compare {metric}: my={v_my:.4f} sk={v_sk:.4f} diff={diff:.4f} -> {'OK' if ok else 'MISMATCH'}")
         else:
             print(f"  Compare {metric}: cannot compare (nan)")
-
 
 if __name__ == "__main__":
     # Load datasets

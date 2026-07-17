@@ -1,4 +1,4 @@
-# Importing library for numerical operations (arrays, math)
+# Importing libraries
 import sys
 import numpy as np
 from pathlib import Path
