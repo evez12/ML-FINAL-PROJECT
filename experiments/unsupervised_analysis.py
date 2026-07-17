@@ -1,4 +1,4 @@
-# Importing libraries
+# Importing library for numerical operations (arrays, math)
 import sys
 import numpy as np
 from pathlib import Path
@@ -203,17 +203,16 @@ def plot_k_distance(kth_distances: np.ndarray, min_samples: int, save_path: Opti
     _save_and_show(save_path)
 
 if __name__ == "__main__":
-    # quick manual test with fake 3-cluster data
-    rng = np.random.default_rng(42)
-    a = rng.normal([0, 0], 0.4, size=(50, 2))
-    b = rng.normal([5, 5], 0.4, size=(50, 2))
-    c = rng.normal([0, 5], 0.4, size=(50, 2))
-    X = np.vstack([a, b, c])
+    # This file is also the script run_all.py calls to produce the unsupervised
+    # section's required output. The real pipeline (loading the three real
+    # datasets, standardizing, running PCA/K-Means/DBSCAN, saving all figures)
+    # lives in run_unsupervised.py -- delegate to it here so both
+    # `python experiments/run_unsupervised.py` and `python experiments/run_all.py`
+    # produce the same real results, instead of this file only running a small
+    # synthetic-data smoke test.
+    from experiments.run_unsupervised import run_pipeline
 
-    k_values, inertias = elbow_method(X, range(1, 8))
-    print("inertias per k:", [round(i, 2) for i in inertias])
-    plot_elbow(k_values, inertias)
-
-    min_samples = 5
-    kdist = k_distance_values(X, min_samples=min_samples)
-    plot_k_distance(kdist, min_samples=min_samples)
+    results = [run_pipeline(name) for name in ["wdbc", "adult", "covtype"]]
+    print(f"\n{'='*10} SUMMARY {'='*10}")
+    for r in results:
+        print(r)
