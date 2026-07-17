@@ -4,3 +4,4 @@ scikit-learn
 pytest
 nbformat
 nbconvert
+matplotlib
