@@ -1,0 +1,4 @@
+Method,Best Parameter,ARI
+K-Means,k=3,0.5257148362467515
+DBSCAN,eps=2.00,0.13511595577670263
+PCA Selection,PCs for 90% var=7,
