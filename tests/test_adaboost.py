@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from src.boosting import AdaBoostClassifier, DecisionStump
+from src.boosting.adaboost import AdaBoostClassifier, DecisionStump
 
 
 # I reuse this simple binary data in several tests.

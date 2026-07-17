@@ -80,7 +80,7 @@ def main():
     print(f"Total Execution Time: {overall_elapsed / 60:.2f} minutes\n")
 
     for script, status in results.items():
-        icon = "Sucsess" if status == "SUCCESS" else "❌"
+        icon = "SUCCESS" if status == "SUCCESS" else "FAILED"
         print(f" {icon} {script:30s} : {status}")
     print("#" * 60)
 
