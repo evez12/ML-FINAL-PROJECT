@@ -78,7 +78,7 @@ def run_rf_vary_n_estimators_arrays(
     df = pd.DataFrame({"n_estimators": np.array(n_list), "test_acc": np.array(test_acc), "oob_acc": np.array(oob_acc)})
 
     # Resolve paths dynamically to guarantee zero path-penalties
-    results_csv = get_figure_path(f"rf_{dataset}_vary_n_estimators.csv")
+    results_csv = f"../report/rf_{dataset}_vary_n_estimators.csv"
     results_csv.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(results_csv, index=False)
     print(f"Saved results CSV to {results_csv}")
@@ -145,7 +145,7 @@ def run_rf_vary_max_depth_arrays(
 
     df = pd.DataFrame({"max_depth": np.array(depths), "test_acc": np.array(test_acc), "oob_acc": np.array(oob_acc)})
 
-    results_csv = get_figure_path(f"rf_{dataset}_vary_max_depth.csv")
+    results_csv = f"../report/ rf_{dataset}_vary_max_depth.csv"
     results_csv.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(results_csv, index=False)
     print(f"Saved results CSV to {results_csv}")

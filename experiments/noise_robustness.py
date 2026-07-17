@@ -1,4 +1,3 @@
-# Experiment 5: Noise robustness (5/10/20% label noise)
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -35,7 +34,7 @@ def run_noise_robustness_arrays(
     X_test,
     y_test,
     dataset: str = "dataset",
-    out_dir: str = "../report/figures",
+    out_dir: str = "../figures",
     n_estimators: int = 100,
     etas=(0.05, 0.10, 0.20),
     random_state: int = 42,

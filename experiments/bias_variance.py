@@ -1,6 +1,3 @@
-# Experiment 6: Bias-variance decomposition (100 bootstrap replicates)
-# Computes probability-based bias^2 and variance (squared-error decomposition)
-
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -95,7 +92,7 @@ def bias_variance_decomposition(model_constructor, X_train, y_train, X_test, y_t
 
     return {"bias_sq": bias_sq, "variance": variance, "brier": brier_total, "acc_mean": float(np.mean(accs))}
 
-def run_on_wdbc(B=100, out_dir="../report/figures", random_state=42):
+def run_on_wdbc(B=100, out_dir="../figures", random_state=42):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -132,7 +129,7 @@ def run_on_wdbc(B=100, out_dir="../report/figures", random_state=42):
         rows.append({"model": name, "bias_sq": r["bias_sq"], "variance": r["variance"], "brier": r["brier"],
                      "acc_mean": r["acc_mean"]})
     df = pd.DataFrame(rows)
-    csv_path = "../report/bias_variance_wdbc.csv"
+    csv_path = "../report/outputs/bias_variance_wdbc.csv"
     df.to_csv(csv_path, index=False)
     print(f"Saved results to {csv_path}")
 
@@ -161,4 +158,4 @@ def run_on_wdbc(B=100, out_dir="../report/figures", random_state=42):
     return df, plot_path
 
 if __name__ == "__main__":
-    run_on_wdbc(B=100, out_dir="../report/figures", random_state=42)
+    run_on_wdbc(B=100, out_dir="../figures", random_state=42)

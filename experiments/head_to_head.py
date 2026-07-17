@@ -1,4 +1,3 @@
-# Experiment 4: Head-to-head (100 estimators, 5-fold CV)
 """
 Run a head-to-head comparison between:
  - single DecisionTree (project implementation)
@@ -40,7 +39,7 @@ def run_head_to_head_arrays(
     X,
     y,
     dataset: str = "dataset",
-    out_dir: str = "../report/figures",
+    out_dir: str = "../figures",
     n_estimators: int = 100,
     cv: int = 5,
     random_state: int = 42,

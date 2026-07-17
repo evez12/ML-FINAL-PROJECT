@@ -1,1 +1,90 @@
-% Team contribution report – placeholder stub
+% =====================================================================
+% CONTRIBUTION_REPORT.tex
+% Team: Aytan Mardaliyev, Ulker Rahimli, Madina Mammadli,
+%       Habil Huseynov, Avaz Huseynov
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+
+\begin{document}
+
+\begin{center}
+    {\Large\bfseries Contribution Report}\\[0.4em]
+    {\large Machine Learning -- Final Project}\\
+    {\itshape Ensemble Methods: Boosting vs. Bagging}\\[0.8em]
+    \begin{tabular}{rl}
+        \textbf{Team:} & Aytan Mardaliyev, Ulker Rahimli, Madina Mammadli, \\
+                       & Habil Huseynov, Avaz Huseynov \\
+        \textbf{Institution:} & AI Academy, National AI Center \\
+        \textbf{Date:} & July 15, 2026 \\
+    \end{tabular}
+\end{center}
+
+\section*{Individual Contributions}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{2.5cm}
+                >{\raggedright\arraybackslash}p{3.0cm}
+                >{\raggedright\arraybackslash}p{2.5cm}
+                >{\raggedright\arraybackslash}p{2.2cm}
+                >{\raggedright\arraybackslash}p{2.2cm}
+                >{\raggedright\arraybackslash}p{2.2cm}}
+\toprule
+\textbf{Member} &
+\textbf{Modules/Code} &
+\textbf{Report Sections} &
+\textbf{Experiments} &
+\textbf{Slides} &
+\textbf{Other} \\
+\midrule
+Aytan Mardaliyev &
+Decision Tree (CART, Gini/entropy, weighted splits, feature importances, repr, unit tests) &
+Methods: Decision Tree &
+Baseline sanity-check vs. sklearn &
+Tree methods overview &
+Critical-path completion; interface stability \\
+\midrule
+Ulker Rahimli &
+AdaBoost (SAMME, weight updates, $\alpha$ computation, staged\_predict, stump wrapper) &
+Methods: AdaBoost &
+Scaling (1–200 stumps), noise robustness for AdaBoost, bias–variance (boosting) &
+Boosting overview &
+Weighted Gini integration with tree \\
+\midrule
+Madina Mammadli &
+Random Forest (bootstrap, OOB, max\_features, multiprocessing, averaged probabilities) &
+Methods: Random Forest &
+RF scaling (n\_estimators, depth), OOB vs test, noise robustness for RF, bias–variance (bagging) &
+Bagging overview &
+Parallelization; RF unit tests \\
+\midrule
+Habil Huseynov &
+PCA, K-Means (elbow, multiple restarts), DBSCAN (k-distance, core/border labels, ARI) &
+Methods: Unsupervised; Results: unsupervised analysis &
+Scree/elbow/k-distance plots; 2D PCA projections; ARI computation &
+Unsupervised results &
+Cluster–class alignment discussion \\
+\midrule
+Avaz Huseynov &
+Dataset selection; preprocessing (scaling, imbalance handling); run\_all.py orchestration &
+Introduction, Experimental Setup, Results (all supervised), Discussion, Conclusion &
+Baseline, head-to-head (5-fold CV), noise robustness orchestration, bias–variance orchestration &
+Motivation, results synthesis, conclusions &
+Report assembly (LaTeX), slide deck skeleton, contribution report, repo hygiene, reproducibility \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{1em}
+
+\end{document}

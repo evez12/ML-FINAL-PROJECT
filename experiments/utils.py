@@ -9,7 +9,7 @@ ROOT_DIR = CURRENT_DIR.parent
 
 # Dynamic directory paths
 DATA_DIR = ROOT_DIR / "data"
-FIGURES_DIR = ROOT_DIR / "report" / "figures"
+FIGURES_DIR = ROOT_DIR / "figures"
 
 
 def get_data_path(filename: str) -> Path:

@@ -1,5 +1,3 @@
-# AdaBoost scaling experiment (rewritten in the style of experiments/scaling.py)
-
 import pandas as pd
 import numpy as np
 
@@ -17,7 +15,7 @@ def run_adaboost_scaling_arrays(
     X_test,
     y_test,
     dataset: str = "dataset",
-    out_dir: str = "../report/figures",
+    out_dir: str = "../figures",
     max_estimators: int = 200,
     step: int = 5,
     random_state: int = 42,

@@ -1,4 +1,3 @@
-# src/experiments/run_all.py
 import os
 import sys
 import time

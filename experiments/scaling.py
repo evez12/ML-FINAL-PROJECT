@@ -1,4 +1,3 @@
-# Experiment 1: Baseline single tree vs sklearn reference – placeholder stub
 import pandas as pd
 import numpy as np
 
